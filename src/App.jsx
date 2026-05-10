@@ -875,14 +875,14 @@ function PrivacyTrustScreen({onDone,onReviewSettings}){
         {/* ── Privacy feature cards ── */}
         <div className="anim-fade-up d3" style={{padding:"20px 20px 0",display:"flex",flexDirection:"column",gap:10}}>
           {privacyFeatures.map((f,i)=>(
-            <div key={i} className="card" style={{padding:"14px 16px",display:"flex",gap:12,alignItems:"flex-start"}}>
+            <div key={i} className="card" style={{padding:"14px 16px",display:"flex",gap:12,alignItems:"flex-start",textAlign:"left"}}>
               <div style={{
                 width:40,height:40,borderRadius:12,flexShrink:0,
                 background:G.badge,border:`1px solid ${G.badgeBorder}`,
                 display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,
               }}>{f.icon}</div>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,flexWrap:"wrap"}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,flexWrap:"wrap"}}>
                   <div style={{color:C.text1,fontWeight:600,fontSize:13}}>{f.title}</div>
                   <div style={{
                     background:G.badge,border:`1px solid ${G.badgeBorder}`,
@@ -890,7 +890,7 @@ function PrivacyTrustScreen({onDone,onReviewSettings}){
                     color:G.badgeText,fontSize:10,fontWeight:700,letterSpacing:.3,whiteSpace:"nowrap",flexShrink:0,
                   }}>{f.badge}</div>
                 </div>
-                <div style={{color:C.text3,fontSize:12,marginTop:3,lineHeight:1.5}}>{f.desc}</div>
+                <div style={{color:C.text3,fontSize:12,lineHeight:1.5,textAlign:"left"}}>{f.desc}</div>
               </div>
             </div>
           ))}
@@ -966,7 +966,7 @@ function PrivacyTrustScreen({onDone,onReviewSettings}){
             }}>
               {consented&&<span style={{fontSize:13,lineHeight:1}}>✓</span>}
             </div>
-            <div style={{flex:1}}>
+            <div style={{flex:1,textAlign:"left"}}>
               <div style={{color:C.text1,fontSize:13,fontWeight:500,lineHeight:1.5}}>
                 I understand and agree to how GlucoRevive AI collects and uses my health data as described above.
               </div>
@@ -1082,7 +1082,7 @@ function OnboardingScreen({onDone}){
               {icon:"📊",t:"Real-time Insights",  s:"Track glucose, meals, sleep & activity in one place"},
               {icon:"🥗",t:"Indian Diet Friendly", s:"Meal plans crafted for South Asian food preferences"},
             ].map((f,i)=>(
-              <div key={i} className={`card anim-fade-up d${i+2}`} style={{padding:"14px 16px",display:"flex",gap:12,alignItems:"flex-start"}}>
+              <div key={i} className={`card anim-fade-up d${i+2}`} style={{padding:"14px 16px",display:"flex",gap:12,alignItems:"flex-start",textAlign:"left"}}>
                 <span style={{fontSize:24}}>{f.icon}</span>
                 <div>
                   <div style={{color:C.text1,fontWeight:600,fontSize:14}}>{f.t}</div>
@@ -1130,7 +1130,7 @@ function OnboardingScreen({onDone}){
             </div>
             {goalOpts.map((g,i)=>(
               <div key={g.id} className={`sel-card anim-fade-up d${i+1} ${goals.includes(g.id)?"selected":""}`} onClick={()=>toggle(g.id)}
-                style={{display:"flex",alignItems:"center",gap:14}}>
+                style={{display:"flex",alignItems:"center",gap:14,textAlign:"left"}}>
                 <span style={{fontSize:26}}>{g.icon}</span>
                 <div style={{flex:1}}>
                   <div style={{color:C.text1,fontWeight:600,fontSize:14}}>{g.label}</div>
@@ -1194,7 +1194,7 @@ function OnboardingScreen({onDone}){
               {icon:"😴",label:"Sleep Quality",      desc:"7–8 hours · Sleep before 11 PM",            color:C.orange},
               {icon:"📅",label:"Weekly Targets",     desc:"HbA1c check · Weight · Sugar logs",         color:C.p500},
             ].map((item,i)=>(
-              <div key={i} className={`card anim-fade-up d${i+1}`} style={{padding:"14px 16px",display:"flex",gap:12,alignItems:"center"}}>
+              <div key={i} className={`card anim-fade-up d${i+1}`} style={{padding:"14px 16px",display:"flex",gap:12,alignItems:"center",textAlign:"left"}}>
                 <div style={{width:44,height:44,borderRadius:12,background:`${item.color}22`,border:`1px solid ${item.color}44`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>{item.icon}</div>
                 <div style={{flex:1}}>
                   <div style={{color:C.text1,fontWeight:600,fontSize:14}}>{item.label}</div>
@@ -1226,8 +1226,8 @@ function Stars({rating,C}){
   return(
     <div style={{display:"flex",gap:1,alignItems:"center"}}>
       {[0,1,2,3,4].map(i=>(
-        <span key={i} style={{fontSize:11,color:i<full?C.orange:(i===full&&half?C.orange:C.ringTrack)}}>
-          {i<full?"★":(i===full&&half?"⯨":"★")}
+        <span key={i} style={{fontSize:11,color:i<full?C.orange:(i===full&&half?C.orange:C.text3),opacity:i>=full&&!(i===full&&half)?0.4:1}}>
+          {i<full?"★":(i===full&&half?"★":"☆")}
         </span>
       ))}
     </div>
@@ -1256,7 +1256,7 @@ function DoctorCard({doc,onSelect,C}){
         )}
       </div>
       {/* info */}
-      <div>
+      <div style={{textAlign:"left"}}>
         <div style={{color:C.text1,fontWeight:700,fontSize:13,lineHeight:1.3,marginBottom:2}}>{doc.name}</div>
         <div style={{color:C.text3,fontSize:11,marginBottom:6,lineHeight:1.3}}>{doc.spec}</div>
         <div style={{display:"flex",alignItems:"center",gap:4,marginBottom:8}}>
@@ -1268,7 +1268,7 @@ function DoctorCard({doc,onSelect,C}){
           <span style={{color:avColor,fontSize:10,fontWeight:600}}>{doc.avail}</span>
         </div>
         <div style={{background:C.gradBtn,borderRadius:8,padding:"6px 0",textAlign:"center",color:"#fff",fontSize:11,fontWeight:700}}>
-          Book Free →
+          Book →
         </div>
       </div>
     </div>
@@ -1760,20 +1760,8 @@ function HomeScreen({setTab}){
   const closeBooking=()=>setBookingState(null);
 
   return(
-    <div className="screen" style={{background:`radial-gradient(ellipse at 80% 0%,${C.mesh1} 0%,transparent 50%),${C.bg}`,position:"relative"}}>
-      <MeshBg/>
-
-      {/* Notification panel (absolute overlay) */}
-      <NotificationPanel
-        open={notifOpen}
-        onClose={()=>setNotifOpen(false)}
-        notifications={notifications}
-        onRead={markRead}
-        onMarkAll={markAll}
-        C={C}
-      />
-
-      {/* Doctor profile overlay */}
+    <>
+      {/* Doctor profile overlay — outside .screen so it covers full app-shell */}
       {selectedDoctor&&(
         <DoctorProfileOverlay
           doc={selectedDoctor}
@@ -1783,7 +1771,7 @@ function HomeScreen({setTab}){
         />
       )}
 
-      {/* Booking form overlay */}
+      {/* Booking form overlay — outside .screen so it covers full app-shell */}
       {bookingState&&(
         <BookingFormOverlay
           doc={bookingState.doc}
@@ -1792,6 +1780,19 @@ function HomeScreen({setTab}){
           C={C}
         />
       )}
+
+    <div className="screen" style={{background:`radial-gradient(ellipse at 80% 0%,${C.mesh1} 0%,transparent 50%),${C.bg}`,position:"relative"}}>
+      <MeshBg/>
+
+      {/* Notification panel */}
+      <NotificationPanel
+        open={notifOpen}
+        onClose={()=>setNotifOpen(false)}
+        notifications={notifications}
+        onRead={markRead}
+        onMarkAll={markAll}
+        C={C}
+      />
 
       {/* Header */}
       <div className="anim-fade-up" style={{padding:"52px 24px 0",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -1917,7 +1918,7 @@ function HomeScreen({setTab}){
           <div style={{position:"absolute",top:-24,right:-24,width:100,height:100,borderRadius:"50%",background:C.accentMid,filter:"blur(28px)",pointerEvents:"none"}}/>
           <div style={{position:"absolute",bottom:-20,left:-10,width:80,height:80,borderRadius:"50%",background:C.mesh2,filter:"blur(24px)",pointerEvents:"none"}}/>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,position:"relative"}}>
-            <div style={{flex:1}}>
+            <div style={{flex:1,textAlign:"left"}}>
               <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
                 <div style={{background:C.greenBg,border:`1px solid ${C.greenBorder}`,borderRadius:999,padding:"3px 10px",color:C.green,fontSize:10,fontWeight:700}}>🎁 FREE</div>
               </div>
@@ -1934,11 +1935,11 @@ function HomeScreen({setTab}){
         </div>
 
         {/* Doctor trust strip */}
-        <div style={{display:"flex",gap:16,marginTop:14,justifyContent:"center"}}>
+        <div style={{display:"flex",marginTop:14,justifyContent:"space-between",padding:"0 4px"}}>
           {[{icon:"⭐",t:"Avg 4.8 Rating"},{icon:"🏥",t:"Certified Experts"},{icon:"🔒",t:"100% Confidential"}].map((b,i)=>(
-            <div key={i} style={{display:"flex",alignItems:"center",gap:5}}>
-              <span style={{fontSize:13}}>{b.icon}</span>
-              <span style={{color:C.text3,fontSize:11,fontWeight:500}}>{b.t}</span>
+            <div key={i} style={{display:"flex",alignItems:"center",gap:4,flexShrink:0}}>
+              <span style={{fontSize:12,flexShrink:0}}>{b.icon}</span>
+              <span style={{color:C.text3,fontSize:11,fontWeight:500,whiteSpace:"nowrap"}}>{b.t}</span>
             </div>
           ))}
         </div>
@@ -1962,7 +1963,7 @@ function HomeScreen({setTab}){
         <div className="card anim-fade-up d4" style={{padding:16,borderColor:C.accentBorder,background:C.accentSubtle,cursor:"pointer"}} onClick={()=>setTab("coach")}>
           <div style={{display:"flex",gap:12,alignItems:"flex-start"}}>
             <div style={{width:36,height:36,borderRadius:10,background:C.gradLogo,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>🤖</div>
-            <div style={{flex:1}}>
+            <div style={{flex:1,textAlign:"left"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
                 <div style={{color:C.text1,fontWeight:600,fontSize:13}}>AI Recommendation</div>
                 <span className="badge badge-purple">New</span>
@@ -1982,6 +1983,7 @@ function HomeScreen({setTab}){
         </div>
       </div>
     </div>
+    </>
   );
 }
 
@@ -2679,7 +2681,7 @@ function ProfileScreen({onSignOut,onCompleteProfile}){
                 onMouseEnter={e=>{if(item.rowClick)e.currentTarget.style.background=C.surfaceHov;}}
                 onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}>
                   <span style={{fontSize:20}}>{item.icon}</span>
-                  <div style={{flex:1,color:item.danger?C.red:C.text1,fontSize:14,fontWeight:500}}>{item.label}</div>
+                  <div style={{flex:1,color:item.danger?C.red:C.text1,fontSize:14,fontWeight:500,textAlign:"left"}}>{item.label}</div>
                   <div style={{display:"flex",alignItems:"center",flexShrink:0}}>{item.rightEl}</div>
                 </div>
               ))}
