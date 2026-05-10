@@ -2093,9 +2093,6 @@ export default function GlucoReviveAI(){
           <div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",width:120,height:4,borderRadius:2,background:`linear-gradient(90deg,transparent,${C.notchGlow},transparent)`,filter:"blur(8px)"}}/>
 
           <div className="app-shell">
-            {/* Theme toggle — always visible */}
-            {screen==="app"&&<ThemeToggle/>}
-
             {screen==="splash"    &&<SplashScreen onDone={()=>setScreen("login")}/>}
             {screen==="login"     &&<LoginScreen  onDone={()=>setScreen("privacy")}/>}
             {screen==="privacy"   &&<PrivacyTrustScreen onDone={()=>setScreen("onboarding")}/>}
