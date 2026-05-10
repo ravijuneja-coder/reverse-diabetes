@@ -298,6 +298,13 @@ body{font-family:'Inter',sans-serif;background:${C.bg};}
 }
 .glow-dot{width:8px;height:8px;border-radius:50%;background:${C.green};box-shadow:0 0 8px ${C.green};}
 
+@keyframes slideDown{from{opacity:0;transform:translateY(-16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes notif-read{from{opacity:1;}to{opacity:0.55;}}
+.notif-panel{animation:slideDown 0.32s cubic-bezier(.22,.68,0,1.2) both;}
+.notif-card{transition:background .18s,opacity .22s;border-radius:16px;cursor:pointer;}
+.notif-card:active{transform:scale(.985);}
+.notif-scrim{position:absolute;inset:0;background:${C.scrim};z-index:40;animation:fadeUp 0.22s ease both;}
+
 .toggle{width:44px;height:24px;border-radius:12px;position:relative;cursor:pointer;transition:background .2s;}
 .toggle-thumb{position:absolute;top:3px;width:18px;height:18px;border-radius:50%;background:${C.white};transition:left .2s;}
 
@@ -337,6 +344,22 @@ const chatHistory = [
   {role:"ai",  text:"White rice has a high glycemic index (GI ~73) which causes rapid blood sugar spikes. Switch to basmati (GI ~58) or cauliflower rice. If you do eat white rice, pair it with dal + veggies + raita to slow absorption. Keep portions to ½ cup cooked. 🍚", time:"9:03 AM"},
   {role:"user",text:"Suggest a diabetic-friendly breakfast", time:"9:10 AM"},
   {role:"ai",  text:"Perfect diabetic breakfast:\n\n🥚 2 boiled eggs + whole wheat toast\n🥑 ½ avocado with lemon\n🍵 Green tea or methi water\n\nEstimated glucose impact: Low 📉\nProtein: 18g | Carbs: 24g | Fiber: 6g", time:"9:10 AM"},
+];
+
+const NOTIF_SEED = [
+  /* ── Today ── */
+  {id:1, group:"Today",     type:"glucose",     icon:"🩸", color:"orange", title:"Post-Meal Glucose Alert",       msg:"Your reading of 162 mg/dL is above target. Consider a 10-min walk to help bring it down.",   time:"2m ago",   badge:"High",     read:false},
+  {id:2, group:"Today",     type:"ai",          icon:"🤖", color:"purple", title:"AI Health Insight",             msg:"Your fasting glucose has improved 8% this week. Great consistency with your morning walk!",   time:"1h ago",   badge:"Insight",  read:false},
+  {id:3, group:"Today",     type:"meal",        icon:"🥗", color:"green",  title:"Lunch Reminder",                msg:"Time for your diabetic-friendly lunch. Today's suggestion: Dal + brown rice + salad.",        time:"12:30 PM", badge:null,       read:false},
+  {id:4, group:"Today",     type:"water",       icon:"💧", color:"cyan",   title:"Hydration Check",               msg:"You've only had 1.2L today. Aim for 3L to support glucose regulation.",                      time:"11:00 AM", badge:null,       read:true},
+  {id:5, group:"Today",     type:"activity",    icon:"🏃", color:"purple", title:"Activity Goal — 64% Complete",  msg:"6,420 steps so far. A 20-min walk will hit your 10k goal for the day.",                      time:"9:45 AM",  badge:null,       read:true},
+  /* ── Yesterday ── */
+  {id:6, group:"Yesterday", type:"ai",          icon:"🧠", color:"purple", title:"Weekly Pattern Detected",       msg:"Your glucose tends to spike on weekday evenings. AI recommends a lighter dinner on weekdays.", time:"8:00 PM",  badge:"Insight",  read:true},
+  {id:7, group:"Yesterday", type:"glucose",     icon:"🩸", color:"green",  title:"Fasting Glucose — Normal",      msg:"Great start! Fasting reading of 88 mg/dL is well within target range.",                       time:"7:10 AM",  badge:"Normal",   read:true},
+  {id:8, group:"Yesterday", type:"appointment", icon:"📅", color:"cyan",   title:"Appointment Reminder",          msg:"Your HbA1c review with Dr. Mehta is scheduled for Friday at 10:30 AM.",                     time:"6:00 AM",  badge:null,       read:true},
+  /* ── Earlier ── */
+  {id:9, group:"Earlier",   type:"progress",    icon:"📊", color:"green",  title:"Weekly Progress Summary",       msg:"Excellent week! HbA1c trend down 0.2%, 5/7 habit goals met, avg glucose 94 mg/dL.",          time:"Mon",      badge:"Summary",  read:true},
+  {id:10,group:"Earlier",   type:"ai",          icon:"🤖", color:"purple", title:"Personalised Plan Updated",     msg:"Your AI coach has updated your meal & activity plan based on last week's data.",              time:"Sun",      badge:"Updated",  read:true},
 ];
 
 /* ═══════════════════════════════════════════════════════════
@@ -571,7 +594,7 @@ function LoginScreen({onDone}){
       )}
 
       {/* Form */}
-      <div style={{padding:"16px 24px 0",display:"flex",flexDirection:"column",gap:12}}>
+      <div style={{padding:"16px 24px 0",display:"flex",flexDirection:"column",gap:12,textAlign:"left"}}>
         {mode==="reset"&&resetSent?(
           <div className="card anim-fade-up" style={{padding:16,textAlign:"center",borderColor:C.greenBorder,background:C.greenCard}}>
             <div style={{fontSize:32,marginBottom:8}}>📧</div>
@@ -1021,7 +1044,7 @@ function OnboardingScreen({onDone}){
         )}
 
         {step===1&&(
-          <div className="anim-fade-up" style={{display:"flex",flexDirection:"column",gap:14}}>
+          <div className="anim-fade-up" style={{display:"flex",flexDirection:"column",gap:14,textAlign:"left"}}>
             <div>
               <div style={{fontWeight:800,fontSize:24,color:C.text1,marginBottom:6}}>Health Assessment</div>
               <div style={{color:C.text3,fontSize:13}}>Help us understand your health baseline</div>
@@ -1145,13 +1168,185 @@ function OnboardingScreen({onDone}){
 }
 
 /* ═══════════════════════════════════════════════════════════
+   NOTIFICATION COMPONENTS
+═══════════════════════════════════════════════════════════ */
+function NotifCard({notif,onRead,C}){
+  const colorMap={
+    orange:{bg:C.orangeCard,  border:C.orangeBorder,  text:C.orange},
+    purple:{bg:C.accentSubtle,border:C.accentBorder,  text:C.p300},
+    green: {bg:C.greenCard,   border:C.greenBorder,   text:C.green},
+    cyan:  {bg:"rgba(6,182,212,0.08)", border:"rgba(6,182,212,0.20)", text:C.cyan},
+  };
+  const col=colorMap[notif.color]||colorMap.purple;
+  return(
+    <div
+      className="notif-card"
+      onClick={()=>onRead(notif.id)}
+      style={{
+        display:"flex",gap:12,padding:"12px 16px",
+        background:notif.read?"transparent":C.accentSubtle,
+        border:`1px solid ${notif.read?C.border:C.accentBorder}`,
+        borderRadius:16,position:"relative",
+        opacity:notif.read?0.72:1,
+      }}
+    >
+      {/* unread dot */}
+      {!notif.read&&(
+        <div style={{position:"absolute",top:12,right:12,width:7,height:7,borderRadius:"50%",background:C.p400,boxShadow:`0 0 6px ${C.p500}`}}/>
+      )}
+
+      {/* icon */}
+      <div style={{
+        width:40,height:40,borderRadius:12,flexShrink:0,
+        background:col.bg,border:`1px solid ${col.border}`,
+        display:"flex",alignItems:"center",justifyContent:"center",fontSize:19,
+      }}>{notif.icon}</div>
+
+      {/* body */}
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:2,flexWrap:"wrap"}}>
+          <div style={{color:C.text1,fontWeight:notif.read?500:700,fontSize:13,lineHeight:1.3}}>{notif.title}</div>
+          {notif.badge&&(
+            <div style={{
+              background:col.bg,border:`1px solid ${col.border}`,borderRadius:999,
+              padding:"1px 7px",color:col.text,fontSize:10,fontWeight:700,
+              letterSpacing:.3,flexShrink:0,
+            }}>{notif.badge}</div>
+          )}
+        </div>
+        <div style={{color:C.text3,fontSize:12,lineHeight:1.5,marginBottom:4,
+          overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",
+        }}>{notif.msg}</div>
+        <div style={{color:C.text3,fontSize:11,opacity:.75}}>{notif.time}</div>
+      </div>
+    </div>
+  );
+}
+
+function NotificationPanel({open,onClose,notifications,onRead,onMarkAll,C}){
+  if(!open)return null;
+  const groups=["Today","Yesterday","Earlier"];
+  const unreadCount=notifications.filter(n=>!n.read).length;
+
+  return(
+    <>
+      {/* scrim */}
+      <div className="notif-scrim" onClick={onClose}/>
+
+      {/* panel */}
+      <div className="notif-panel" style={{
+        position:"absolute",top:0,left:0,right:0,
+        maxHeight:"88%",zIndex:50,
+        background:C.sheetBg,
+        borderBottomLeftRadius:28,borderBottomRightRadius:28,
+        border:`1px solid ${C.border}`,
+        borderTop:"none",
+        boxShadow:C.shellShadow,
+        display:"flex",flexDirection:"column",
+        backdropFilter:"blur(24px)",
+        overflow:"hidden",
+      }}>
+        {/* header */}
+        <div style={{
+          padding:"52px 20px 14px",
+          background:C.navBg,
+          borderBottom:`1px solid ${C.border}`,
+          backdropFilter:"blur(20px)",
+          display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0,
+        }}>
+          <div>
+            <div style={{color:C.text1,fontWeight:700,fontSize:18}}>Notifications</div>
+            {unreadCount>0&&(
+              <div style={{color:C.text3,fontSize:12,marginTop:2}}>{unreadCount} unread</div>
+            )}
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            {unreadCount>0&&(
+              <button onClick={onMarkAll} style={{
+                background:C.accentSubtle,border:`1px solid ${C.accentBorder}`,
+                borderRadius:10,padding:"6px 12px",cursor:"pointer",
+                color:C.p300,fontSize:12,fontWeight:600,fontFamily:"'Inter',sans-serif",
+              }}>Mark all read</button>
+            )}
+            <button onClick={onClose} style={{
+              width:32,height:32,borderRadius:10,border:`1px solid ${C.border}`,
+              background:C.surface,cursor:"pointer",
+              display:"flex",alignItems:"center",justifyContent:"center",
+              color:C.text2,fontSize:16,fontFamily:"'Inter',sans-serif",lineHeight:1,
+            }}>✕</button>
+          </div>
+        </div>
+
+        {/* list */}
+        <div style={{overflowY:"auto",flex:1,padding:"0 16px 20px"}}>
+          {notifications.length===0?(
+            <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"60px 20px",gap:12}}>
+              <div style={{fontSize:48}}>🔔</div>
+              <div style={{color:C.text1,fontWeight:600,fontSize:16}}>All caught up!</div>
+              <div style={{color:C.text3,fontSize:13,textAlign:"center",lineHeight:1.5}}>No new notifications. Check back after your next health log.</div>
+            </div>
+          ):(
+            groups.map(grp=>{
+              const items=notifications.filter(n=>n.group===grp);
+              if(!items.length)return null;
+              return(
+                <div key={grp}>
+                  <div style={{
+                    color:C.text3,fontSize:11,fontWeight:700,letterSpacing:.8,
+                    textTransform:"uppercase",padding:"16px 0 8px",
+                  }}>{grp}</div>
+                  <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                    {items.map(n=>(
+                      <NotifCard key={n.id} notif={n} onRead={onRead} C={C}/>
+                    ))}
+                  </div>
+                </div>
+              );
+            })
+          )}
+
+          {/* view all footer */}
+          {notifications.length>0&&(
+            <div style={{textAlign:"center",paddingTop:16}}>
+              <div style={{
+                color:C.p300,fontSize:13,fontWeight:600,cursor:"pointer",
+                display:"inline-flex",alignItems:"center",gap:4,
+              }}>
+                View all notifications <SvgIcon d={IC.skip} size={13} color={C.p300} sw={2}/>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    HOME DASHBOARD
 ═══════════════════════════════════════════════════════════ */
 function HomeScreen({setTab}){
   const C=useTheme();
+  const[notifOpen,setNotifOpen]=useState(false);
+  const[notifications,setNotifications]=useState(NOTIF_SEED);
+  const unread=notifications.filter(n=>!n.read).length;
+
+  const markRead=(id)=>setNotifications(ns=>ns.map(n=>n.id===id?{...n,read:true}:n));
+  const markAll=()=>setNotifications(ns=>ns.map(n=>({...n,read:true})));
+
   return(
     <div className="screen" style={{background:`radial-gradient(ellipse at 80% 0%,${C.mesh1} 0%,transparent 50%),${C.bg}`,position:"relative"}}>
       <MeshBg/>
+
+      {/* Notification panel (absolute overlay) */}
+      <NotificationPanel
+        open={notifOpen}
+        onClose={()=>setNotifOpen(false)}
+        notifications={notifications}
+        onRead={markRead}
+        onMarkAll={markAll}
+        C={C}
+      />
 
       {/* Header */}
       <div className="anim-fade-up" style={{padding:"52px 24px 0",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -1160,13 +1355,17 @@ function HomeScreen({setTab}){
           <div style={{color:C.text1,fontWeight:700,fontSize:22,marginTop:2}}>Aarav Sharma</div>
         </div>
         <div style={{display:"flex",gap:10,alignItems:"center"}}>
-          <div style={{position:"relative"}}>
-            <div style={{width:40,height:40,borderRadius:12,background:C.surface,border:`1px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
-              <Icon name="bell" size={18}/>
+          <div style={{position:"relative"}} onClick={()=>setNotifOpen(v=>!v)}>
+            <div style={{width:40,height:40,borderRadius:12,background:notifOpen?C.accentSubtle:C.surface,border:`1px solid ${notifOpen?C.accentBorder:C.border}`,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .2s"}}>
+              <Icon name="bell" size={18} color={notifOpen?C.p400:undefined}/>
             </div>
-            <div style={{position:"absolute",top:8,right:8,width:8,height:8,borderRadius:"50%",background:C.orange,border:`2px solid ${C.bg}`}}/>
+            {unread>0&&(
+              <div style={{position:"absolute",top:-4,right:-4,minWidth:18,height:18,borderRadius:9,background:C.orange,border:`2px solid ${C.bg}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:"#fff",padding:"0 4px"}}>
+                {unread>9?"9+":unread}
+              </div>
+            )}
           </div>
-          <div style={{width:40,height:40,borderRadius:12,background:C.gradLogo,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:14,color:C.white,cursor:"pointer"}}>AS</div>
+          <div onClick={()=>setTab("profile")} style={{width:40,height:40,borderRadius:12,background:C.gradLogo,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:14,color:C.white,cursor:"pointer",transition:"opacity .15s"}} onMouseEnter={e=>e.currentTarget.style.opacity=".8"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>AS</div>
         </div>
       </div>
 
