@@ -305,6 +305,23 @@ body{font-family:'Inter',sans-serif;background:${C.bg};}
 .notif-card:active{transform:scale(.985);}
 .notif-scrim{position:absolute;inset:0;background:${C.scrim};z-index:40;animation:fadeUp 0.22s ease both;}
 
+@keyframes slideUp{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);}}
+@keyframes overlayIn{from{opacity:0;transform:translateY(100%);}to{opacity:1;transform:translateY(0);}}
+.slide-up{animation:slideUp 0.38s cubic-bezier(.22,.68,0,1.2) both;}
+.overlay-in{animation:overlayIn 0.38s cubic-bezier(.25,.8,.25,1) both;}
+.doc-scroll{display:flex;gap:14px;overflow-x:auto;padding:0 24px 8px;scroll-snap-type:x mandatory;}
+.doc-scroll::-webkit-scrollbar{display:none;}
+.doc-card{scroll-snap-align:start;flex-shrink:0;width:156px;border-radius:20px;cursor:pointer;transition:transform .18s,box-shadow .18s;}
+.doc-card:active{transform:scale(.96);}
+.consult-scrim{position:absolute;inset:0;background:${C.scrim};z-index:60;}
+.overlay-panel{position:absolute;inset:0;z-index:70;display:flex;flex-direction:column;background:${C.bg};overflow:hidden;}
+.form-row{display:flex;flex-direction:column;gap:6px;}
+.form-label{color:${C.text2};font-size:13px;font-weight:500;text-align:left;}
+.time-chip{border:1.5px solid ${C.border};border-radius:10px;padding:8px 12px;cursor:pointer;font-size:12px;font-weight:500;color:${C.text2};background:${C.surface};transition:all .18s;text-align:center;}
+.time-chip.selected{border-color:${C.p500};background:${C.selCardSel};color:${C.p300};}
+.gender-chip{border:1.5px solid ${C.border};border-radius:10px;padding:8px 0;cursor:pointer;font-size:13px;font-weight:500;color:${C.text2};background:${C.surface};transition:all .18s;text-align:center;flex:1;}
+.gender-chip.selected{border-color:${C.p500};background:${C.selCardSel};color:${C.p300};}
+
 .toggle{width:44px;height:24px;border-radius:12px;position:relative;cursor:pointer;transition:background .2s;}
 .toggle-thumb{position:absolute;top:3px;width:18px;height:18px;border-radius:50%;background:${C.white};transition:left .2s;}
 
@@ -344,6 +361,39 @@ const chatHistory = [
   {role:"ai",  text:"White rice has a high glycemic index (GI ~73) which causes rapid blood sugar spikes. Switch to basmati (GI ~58) or cauliflower rice. If you do eat white rice, pair it with dal + veggies + raita to slow absorption. Keep portions to ½ cup cooked. 🍚", time:"9:03 AM"},
   {role:"user",text:"Suggest a diabetic-friendly breakfast", time:"9:10 AM"},
   {role:"ai",  text:"Perfect diabetic breakfast:\n\n🥚 2 boiled eggs + whole wheat toast\n🥑 ½ avocado with lemon\n🍵 Green tea or methi water\n\nEstimated glucose impact: Low 📉\nProtein: 18g | Carbs: 24g | Fiber: 6g", time:"9:10 AM"},
+];
+
+const DOCTORS_DATA = [
+  {id:1,emoji:"👩‍⚕️",name:"Dr. Priya Mehta",spec:"Diabetologist",exp:"12 yrs",rating:4.9,reviews:248,avail:"Today",availColor:"green",verified:true,
+   langs:["English","Hindi","Gujarati"],
+   expertise:["Type 2 Diabetes","Prediabetes Reversal","Insulin Management","Lifestyle Medicine"],
+   bio:"Dr. Priya Mehta is a certified diabetologist with over 12 years of experience helping patients reverse Type 2 diabetes through evidence-based lifestyle interventions. She has helped 500+ patients achieve normal HbA1c levels.",
+   times:["10:00 AM","11:30 AM","2:00 PM","4:30 PM","6:00 PM"],
+   fee:"Free"},
+  {id:2,emoji:"👨‍⚕️",name:"Dr. Arjun Singh",spec:"Endocrinologist",exp:"9 yrs",rating:4.8,reviews:192,avail:"Tomorrow",availColor:"orange",verified:true,
+   langs:["English","Hindi","Punjabi"],
+   expertise:["Hormonal Disorders","Metabolic Syndrome","PCOS & Diabetes","Weight Management"],
+   bio:"Dr. Arjun Singh specialises in endocrinology and metabolic disorders. His integrative approach combines modern medicine with nutritional science to achieve lasting glucose control for his patients.",
+   times:["9:00 AM","12:00 PM","3:00 PM","5:00 PM"],
+   fee:"Free"},
+  {id:3,emoji:"👩‍⚕️",name:"Dr. Sunita Rao",spec:"Nutritionist & Dietitian",exp:"7 yrs",rating:4.7,reviews:315,avail:"Today",availColor:"green",verified:true,
+   langs:["English","Telugu","Tamil"],
+   expertise:["Diabetic Diet Planning","Indian Meal Protocols","Glycemic Index Coaching","Weight Loss"],
+   bio:"Dr. Sunita Rao is a clinical nutritionist who crafts personalised South Asian diabetic meal plans. Her South Indian diet protocols have helped hundreds achieve stable glucose levels without giving up traditional foods.",
+   times:["11:00 AM","1:00 PM","3:30 PM","5:30 PM"],
+   fee:"Free"},
+  {id:4,emoji:"👨‍⚕️",name:"Dr. Vikram Nair",spec:"Lifestyle Medicine",exp:"15 yrs",rating:4.9,reviews:421,avail:"Today",availColor:"green",verified:true,
+   langs:["English","Malayalam","Hindi"],
+   expertise:["Diabetes Reversal","Stress & Glucose","Sleep Optimisation","Exercise Physiology"],
+   bio:"Dr. Vikram Nair is a pioneer in lifestyle medicine with 15 years of clinical experience. He takes a holistic approach to diabetes reversal, addressing sleep, stress, movement, and nutrition as interconnected systems.",
+   times:["8:00 AM","10:30 AM","1:00 PM","4:00 PM"],
+   fee:"Free"},
+  {id:5,emoji:"👩‍⚕️",name:"Dr. Meera Joshi",spec:"General Physician",exp:"10 yrs",rating:4.6,reviews:178,avail:"In 2 days",availColor:"cyan",verified:true,
+   langs:["English","Marathi","Hindi"],
+   expertise:["Preventive Health","Chronic Disease Management","Medication Review","Holistic Care"],
+   bio:"Dr. Meera Joshi provides comprehensive primary care with a focus on preventing diabetes complications. She is known for her compassionate patient communication and long-term health planning.",
+   times:["10:00 AM","2:00 PM","5:00 PM"],
+   fee:"Free"},
 ];
 
 const NOTIF_SEED = [
@@ -1168,6 +1218,376 @@ function OnboardingScreen({onDone}){
 }
 
 /* ═══════════════════════════════════════════════════════════
+   CONSULTATION COMPONENTS
+═══════════════════════════════════════════════════════════ */
+function Stars({rating,C}){
+  const full=Math.floor(rating);
+  const half=rating-full>=0.5;
+  return(
+    <div style={{display:"flex",gap:1,alignItems:"center"}}>
+      {[0,1,2,3,4].map(i=>(
+        <span key={i} style={{fontSize:11,color:i<full?C.orange:(i===full&&half?C.orange:C.ringTrack)}}>
+          {i<full?"★":(i===full&&half?"⯨":"★")}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function DoctorCard({doc,onSelect,C}){
+  const colorMap={green:C.green,orange:C.orange,cyan:C.cyan};
+  const bgMap={green:C.greenBg,orange:C.orangeBg,cyan:"rgba(6,182,212,0.12)"};
+  const bMap={green:C.greenBorder,orange:C.orangeBorder,cyan:"rgba(6,182,212,0.25)"};
+  const avColor=colorMap[doc.availColor]||C.green;
+  const avBg=bgMap[doc.availColor]||C.greenBg;
+  const avBorder=bMap[doc.availColor]||C.greenBorder;
+  return(
+    <div className="doc-card card" onClick={()=>onSelect(doc)} style={{padding:14,display:"flex",flexDirection:"column",gap:10}}>
+      {/* avatar */}
+      <div style={{position:"relative",alignSelf:"flex-start"}}>
+        <div style={{
+          width:52,height:52,borderRadius:16,fontSize:30,
+          background:C.gradHeroCard,border:`1px solid ${C.gradHeroBorder}`,
+          display:"flex",alignItems:"center",justifyContent:"center",
+        }}>{doc.emoji}</div>
+        {doc.verified&&(
+          <div style={{position:"absolute",bottom:-4,right:-4,width:18,height:18,borderRadius:"50%",
+            background:C.gradLogo,display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,border:`2px solid ${C.bg}`}}>✓</div>
+        )}
+      </div>
+      {/* info */}
+      <div>
+        <div style={{color:C.text1,fontWeight:700,fontSize:13,lineHeight:1.3,marginBottom:2}}>{doc.name}</div>
+        <div style={{color:C.text3,fontSize:11,marginBottom:6,lineHeight:1.3}}>{doc.spec}</div>
+        <div style={{display:"flex",alignItems:"center",gap:4,marginBottom:8}}>
+          <Stars rating={doc.rating} C={C}/>
+          <span style={{color:C.text3,fontSize:10}}>{doc.rating}</span>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:8}}>
+          <div style={{width:6,height:6,borderRadius:"50%",background:avColor,flexShrink:0}}/>
+          <span style={{color:avColor,fontSize:10,fontWeight:600}}>{doc.avail}</span>
+        </div>
+        <div style={{background:C.gradBtn,borderRadius:8,padding:"6px 0",textAlign:"center",color:"#fff",fontSize:11,fontWeight:700}}>
+          Book Free →
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DoctorProfileOverlay({doc,onClose,onBook,C}){
+  const[selTime,setSelTime]=useState(null);
+  if(!doc)return null;
+  const colorMap={green:C.green,orange:C.orange,cyan:C.cyan};
+  const avColor=colorMap[doc.availColor]||C.green;
+
+  return(
+    <div className="overlay-panel overlay-in">
+      {/* sticky header */}
+      <div style={{padding:"52px 20px 16px",background:C.navBg,borderBottom:`1px solid ${C.border}`,backdropFilter:"blur(20px)",flexShrink:0,display:"flex",alignItems:"center",gap:12}}>
+        <button onClick={onClose} style={{width:34,height:34,borderRadius:10,background:C.surface,border:`1px solid ${C.border}`,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:C.text2,fontSize:16,fontFamily:"Inter,sans-serif",flexShrink:0}}>←</button>
+        <div style={{color:C.text1,fontWeight:700,fontSize:17}}>Doctor Profile</div>
+      </div>
+
+      {/* scrollable body */}
+      <div style={{flex:1,overflowY:"auto",padding:"0 0 100px"}}>
+
+        {/* hero */}
+        <div style={{padding:"24px 20px 0",display:"flex",gap:16,alignItems:"flex-start"}}>
+          <div style={{position:"relative",flexShrink:0}}>
+            <div style={{width:80,height:80,borderRadius:24,fontSize:44,background:C.gradHeroCard,border:`1px solid ${C.gradHeroBorder}`,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 12px 36px ${C.accentBorder}`}}>{doc.emoji}</div>
+            {doc.verified&&(
+              <div style={{position:"absolute",bottom:-4,right:-4,width:22,height:22,borderRadius:"50%",background:C.gradLogo,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,border:`2px solid ${C.bg}`,color:"#fff",fontWeight:700}}>✓</div>
+            )}
+          </div>
+          <div style={{flex:1}}>
+            <div style={{color:C.text1,fontWeight:800,fontSize:18,marginBottom:2}}>{doc.name}</div>
+            <div style={{color:C.text2,fontSize:13,marginBottom:6}}>{doc.spec} · {doc.exp}</div>
+            <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+              <div style={{display:"flex",alignItems:"center",gap:4}}>
+                <Stars rating={doc.rating} C={C}/>
+                <span style={{color:C.text1,fontSize:12,fontWeight:600}}>{doc.rating}</span>
+                <span style={{color:C.text3,fontSize:11}}>({doc.reviews})</span>
+              </div>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:5,marginTop:6}}>
+              <div style={{width:7,height:7,borderRadius:"50%",background:avColor}}/>
+              <span style={{color:avColor,fontSize:12,fontWeight:600}}>Available {doc.avail}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* free badge */}
+        <div style={{padding:"16px 20px 0"}}>
+          <div style={{background:C.greenBg,border:`1px solid ${C.greenBorder}`,borderRadius:12,padding:"10px 16px",display:"flex",alignItems:"center",gap:10}}>
+            <span style={{fontSize:18}}>🎁</span>
+            <div>
+              <div style={{color:C.green,fontWeight:700,fontSize:13}}>Free Consultation</div>
+              <div style={{color:C.text3,fontSize:11,marginTop:1}}>First session is completely free — no credit card required.</div>
+            </div>
+          </div>
+        </div>
+
+        {/* bio */}
+        <div style={{padding:"16px 20px 0"}}>
+          <div className="card" style={{padding:16}}>
+            <div style={{color:C.text1,fontWeight:600,fontSize:14,marginBottom:8}}>About</div>
+            <div style={{color:C.text3,fontSize:13,lineHeight:1.65}}>{doc.bio}</div>
+          </div>
+        </div>
+
+        {/* expertise */}
+        <div style={{padding:"14px 20px 0"}}>
+          <div style={{color:C.text1,fontWeight:600,fontSize:14,marginBottom:10}}>Expertise</div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+            {doc.expertise.map((e,i)=>(
+              <div key={i} style={{background:C.accentSubtle,border:`1px solid ${C.accentBorder}`,borderRadius:999,padding:"5px 12px",color:C.p300,fontSize:12,fontWeight:500}}>{e}</div>
+            ))}
+          </div>
+        </div>
+
+        {/* languages */}
+        <div style={{padding:"14px 20px 0"}}>
+          <div style={{color:C.text1,fontWeight:600,fontSize:14,marginBottom:10}}>Languages</div>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            {doc.langs.map((l,i)=>(
+              <div key={i} style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,padding:"4px 10px",color:C.text2,fontSize:12}}>🌐 {l}</div>
+            ))}
+          </div>
+        </div>
+
+        {/* time slots */}
+        <div style={{padding:"14px 20px 0"}}>
+          <div style={{color:C.text1,fontWeight:600,fontSize:14,marginBottom:10}}>Available Timings</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+            {doc.times.map((t,i)=>(
+              <div key={i} className={`time-chip${selTime===t?" selected":""}`} onClick={()=>setSelTime(t)}>
+                🕐 {t}
+              </div>
+            ))}
+          </div>
+          {!selTime&&<div style={{color:C.text3,fontSize:11,marginTop:8}}>Select a time slot to continue</div>}
+        </div>
+
+        {/* reviews preview */}
+        <div style={{padding:"14px 20px 0"}}>
+          <div style={{color:C.text1,fontWeight:600,fontSize:14,marginBottom:10}}>Patient Reviews</div>
+          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            {[
+              {name:"Rahul M.",text:"Dr. was extremely helpful and understood my lifestyle completely. My HbA1c dropped from 7.2 to 5.9 in 6 months!",stars:5},
+              {name:"Ananya S.",text:"Very knowledgeable and patient. Explained everything clearly and the meal plan she gave actually works for Indian food.",stars:5},
+            ].map((r,i)=>(
+              <div key={i} className="card" style={{padding:"12px 14px"}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
+                  <div style={{color:C.text1,fontWeight:600,fontSize:13}}>{r.name}</div>
+                  <div style={{display:"flex",gap:1}}>{[...Array(r.stars)].map((_,j)=><span key={j} style={{fontSize:11,color:C.orange}}>★</span>)}</div>
+                </div>
+                <div style={{color:C.text3,fontSize:12,lineHeight:1.55}}>{r.text}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+      {/* sticky CTA */}
+      <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"16px 20px 28px",background:C.navBg,borderTop:`1px solid ${C.border}`,backdropFilter:"blur(20px)"}}>
+        <button
+          onClick={()=>{if(selTime)onBook(doc,selTime);}}
+          style={{
+            width:"100%",padding:"15px",borderRadius:14,border:"none",
+            background:selTime?C.gradBtn:C.surface,
+            color:selTime?"#fff":C.text3,fontWeight:700,fontSize:15,
+            fontFamily:"Inter,sans-serif",cursor:selTime?"pointer":"not-allowed",
+            transition:"all .2s",boxShadow:selTime?`0 8px 24px ${C.accentBorder}`:"none",
+          }}
+        >
+          {selTime?`Book Free · ${selTime}`:"Select a time slot first"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function BookingFormOverlay({doc,selTime,onClose,C}){
+  const[form,setForm]=useState({name:"",mobile:"",email:"",age:"",gender:"",concern:"",notes:""});
+  const[step,setStep]=useState("form"); // form | loading | success
+  const[errors,setErrors]=useState({});
+
+  const set=(k,v)=>setForm(f=>({...f,[k]:v}));
+
+  const validate=()=>{
+    const e={};
+    if(!form.name.trim())e.name="Name is required";
+    if(!form.mobile.trim()||!/^\d{10}$/.test(form.mobile.trim()))e.mobile="Enter a valid 10-digit mobile number";
+    if(!form.email.trim()||!form.email.includes("@"))e.email="Enter a valid email address";
+    if(!form.age.trim())e.age="Age is required";
+    if(!form.gender)e.gender="Please select gender";
+    if(!form.concern.trim())e.concern="Please describe your health concern";
+    return e;
+  };
+
+  const submit=()=>{
+    const e=validate();
+    if(Object.keys(e).length){setErrors(e);return;}
+    setStep("loading");
+    setTimeout(()=>setStep("success"),2200);
+  };
+
+  const Field=({k,label,placeholder,type="text",children})=>(
+    <div className="form-row">
+      <label className="form-label">{label}</label>
+      {children||(
+        <input
+          className="ds-input"
+          type={type}
+          placeholder={placeholder}
+          value={form[k]}
+          onChange={e=>set(k,e.target.value)}
+          style={errors[k]?{borderColor:C.red,boxShadow:`0 0 0 3px ${C.redBg}`}:{}}
+        />
+      )}
+      {errors[k]&&<div style={{color:C.red,fontSize:11,marginTop:2}}>⚠ {errors[k]}</div>}
+    </div>
+  );
+
+  if(step==="success"){
+    return(
+      <div className="overlay-panel overlay-in" style={{alignItems:"center",justifyContent:"center",padding:32}}>
+        <div style={{textAlign:"center",maxWidth:300}}>
+          <div className="anim-float" style={{fontSize:72,marginBottom:16}}>✅</div>
+          <div style={{color:C.text1,fontWeight:800,fontSize:22,marginBottom:10,lineHeight:1.3}}>Consultation<br/>Requested!</div>
+          <div style={{color:C.text2,fontSize:14,lineHeight:1.65,marginBottom:8}}>
+            Your free consultation with <strong>{doc.name}</strong> has been requested for <strong>{selTime}</strong>.
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:8,justifyContent:"center",marginBottom:24,
+            background:C.greenBg,border:`1px solid ${C.greenBorder}`,borderRadius:12,padding:"10px 16px"}}>
+            <span style={{fontSize:16}}>🕐</span>
+            <div style={{color:C.green,fontSize:13,fontWeight:600}}>Doctor will contact you within 2 hours</div>
+          </div>
+          <div style={{color:C.text3,fontSize:12,lineHeight:1.5,marginBottom:28}}>
+            🔒 Your personal health details are securely encrypted and protected.
+          </div>
+          <button onClick={onClose} style={{
+            width:"100%",padding:"14px",borderRadius:14,border:"none",
+            background:C.gradBtn,color:"#fff",fontWeight:700,fontSize:15,
+            fontFamily:"Inter,sans-serif",cursor:"pointer",boxShadow:`0 8px 24px ${C.accentBorder}`,
+          }}>Return to Dashboard</button>
+        </div>
+      </div>
+    );
+  }
+
+  if(step==="loading"){
+    return(
+      <div className="overlay-panel" style={{alignItems:"center",justifyContent:"center",gap:16}}>
+        <Spinner size={36} color={C.p500}/>
+        <div style={{color:C.text1,fontWeight:600,fontSize:16}}>Booking your consultation…</div>
+        <div style={{color:C.text3,fontSize:13}}>Securely processing your request</div>
+      </div>
+    );
+  }
+
+  return(
+    <div className="overlay-panel overlay-in">
+      {/* header */}
+      <div style={{padding:"52px 20px 16px",background:C.navBg,borderBottom:`1px solid ${C.border}`,backdropFilter:"blur(20px)",flexShrink:0,display:"flex",alignItems:"center",gap:12}}>
+        <button onClick={onClose} style={{width:34,height:34,borderRadius:10,background:C.surface,border:`1px solid ${C.border}`,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:C.text2,fontSize:16,fontFamily:"Inter,sans-serif",flexShrink:0}}>←</button>
+        <div>
+          <div style={{color:C.text1,fontWeight:700,fontSize:17}}>Book Consultation</div>
+          <div style={{color:C.text3,fontSize:12}}>{doc.name} · {selTime}</div>
+        </div>
+      </div>
+
+      {/* form */}
+      <div style={{flex:1,overflowY:"auto",padding:"20px 20px 120px",display:"flex",flexDirection:"column",gap:16}}>
+
+        <Field k="name" label="Full Name" placeholder="Aarav Sharma"/>
+
+        {/* mobile + trust */}
+        <div className="form-row">
+          <label className="form-label">Mobile Number</label>
+          <div style={{position:"relative"}}>
+            <div style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",color:C.text3,fontSize:13,fontWeight:500}}>+91</div>
+            <input className="ds-input" type="tel" placeholder="98XXXXXXXX" value={form.mobile} onChange={e=>set("mobile",e.target.value)}
+              style={{paddingLeft:46,...(errors.mobile?{borderColor:C.red,boxShadow:`0 0 0 3px ${C.redBg}`}:{})}}/>
+          </div>
+          {errors.mobile&&<div style={{color:C.red,fontSize:11,marginTop:2}}>⚠ {errors.mobile}</div>}
+          <div style={{display:"flex",alignItems:"center",gap:6,marginTop:4}}>
+            <span style={{fontSize:12}}>🔒</span>
+            <span style={{color:C.text3,fontSize:11,lineHeight:1.4}}>Your number is securely protected and will never be shared or used for spam.</span>
+          </div>
+        </div>
+
+        <Field k="email" label="Email Address" placeholder="hello@example.com" type="email"/>
+
+        <Field k="age" label="Age" placeholder="e.g. 38" type="number"/>
+
+        {/* gender */}
+        <div className="form-row">
+          <label className="form-label">Gender</label>
+          <div style={{display:"flex",gap:8}}>
+            {["Male","Female","Other"].map(g=>(
+              <div key={g} className={`gender-chip${form.gender===g?" selected":""}`} onClick={()=>{set("gender",g);if(errors.gender)setErrors(e=>({...e,gender:undefined}));}}>
+                {g==="Male"?"👨 ":g==="Female"?"👩 ":"🧑 "}{g}
+              </div>
+            ))}
+          </div>
+          {errors.gender&&<div style={{color:C.red,fontSize:11,marginTop:2}}>⚠ {errors.gender}</div>}
+        </div>
+
+        {/* health concern */}
+        <div className="form-row">
+          <label className="form-label">Health Concern</label>
+          <textarea
+            className="ds-input"
+            placeholder="Briefly describe your health concern or what you'd like to discuss…"
+            value={form.concern}
+            onChange={e=>set("concern",e.target.value)}
+            rows={3}
+            style={{resize:"none",lineHeight:1.55,...(errors.concern?{borderColor:C.red,boxShadow:`0 0 0 3px ${C.redBg}`}:{})}}
+          />
+          {errors.concern&&<div style={{color:C.red,fontSize:11,marginTop:2}}>⚠ {errors.concern}</div>}
+        </div>
+
+        <div className="form-row">
+          <label className="form-label">Additional Notes <span style={{color:C.text3,fontWeight:400}}>(optional)</span></label>
+          <textarea
+            className="ds-input"
+            placeholder="Any other information you'd like to share with the doctor…"
+            value={form.notes}
+            onChange={e=>set("notes",e.target.value)}
+            rows={2}
+            style={{resize:"none",lineHeight:1.55}}
+          />
+        </div>
+
+        {/* privacy note */}
+        <div style={{display:"flex",alignItems:"flex-start",gap:8,background:C.accentSubtle,border:`1px solid ${C.accentBorder}`,borderRadius:12,padding:"12px 14px"}}>
+          <span style={{fontSize:16,flexShrink:0}}>🛡️</span>
+          <div style={{color:C.text3,fontSize:12,lineHeight:1.5}}>Your personal health details are securely encrypted and protected. We follow privacy-first healthcare principles.</div>
+        </div>
+
+      </div>
+
+      {/* sticky footer */}
+      <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"14px 20px 28px",background:C.navBg,borderTop:`1px solid ${C.border}`,backdropFilter:"blur(20px)",display:"flex",flexDirection:"column",gap:10}}>
+        <button onClick={submit} style={{
+          width:"100%",padding:"15px",borderRadius:14,border:"none",
+          background:C.gradBtn,color:"#fff",fontWeight:700,fontSize:15,
+          fontFamily:"Inter,sans-serif",cursor:"pointer",boxShadow:`0 8px 24px ${C.accentBorder}`,
+        }}>🩺 Book Free Consultation</button>
+        <button onClick={onClose} style={{
+          width:"100%",padding:"13px",borderRadius:14,border:`1px solid ${C.border}`,
+          background:"transparent",color:C.text2,fontWeight:500,fontSize:14,
+          fontFamily:"Inter,sans-serif",cursor:"pointer",
+        }}>Cancel</button>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    NOTIFICATION COMPONENTS
 ═══════════════════════════════════════════════════════════ */
 function NotifCard({notif,onRead,C}){
@@ -1330,9 +1750,14 @@ function HomeScreen({setTab}){
   const[notifOpen,setNotifOpen]=useState(false);
   const[notifications,setNotifications]=useState(NOTIF_SEED);
   const unread=notifications.filter(n=>!n.read).length;
+  const[selectedDoctor,setSelectedDoctor]=useState(null);
+  const[bookingState,setBookingState]=useState(null); // {doc, time}
 
   const markRead=(id)=>setNotifications(ns=>ns.map(n=>n.id===id?{...n,read:true}:n));
   const markAll=()=>setNotifications(ns=>ns.map(n=>({...n,read:true})));
+  const openProfile=(doc)=>{setSelectedDoctor(doc);setNotifOpen(false);};
+  const openBooking=(doc,time)=>{setBookingState({doc,time});setSelectedDoctor(null);};
+  const closeBooking=()=>setBookingState(null);
 
   return(
     <div className="screen" style={{background:`radial-gradient(ellipse at 80% 0%,${C.mesh1} 0%,transparent 50%),${C.bg}`,position:"relative"}}>
@@ -1347,6 +1772,26 @@ function HomeScreen({setTab}){
         onMarkAll={markAll}
         C={C}
       />
+
+      {/* Doctor profile overlay */}
+      {selectedDoctor&&(
+        <DoctorProfileOverlay
+          doc={selectedDoctor}
+          onClose={()=>setSelectedDoctor(null)}
+          onBook={(doc,time)=>openBooking(doc,time)}
+          C={C}
+        />
+      )}
+
+      {/* Booking form overlay */}
+      {bookingState&&(
+        <BookingFormOverlay
+          doc={bookingState.doc}
+          selTime={bookingState.time}
+          onClose={closeBooking}
+          C={C}
+        />
+      )}
 
       {/* Header */}
       <div className="anim-fade-up" style={{padding:"52px 24px 0",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -1459,6 +1904,56 @@ function HomeScreen({setTab}){
             <div style={{display:"flex",gap:6,alignItems:"center"}}><div style={{width:12,height:3,borderRadius:2,background:C.green}}/><span style={{color:C.text3,fontSize:11}}>Fasting</span></div>
             <div style={{display:"flex",gap:6,alignItems:"center"}}><div style={{width:12,height:3,borderRadius:2,background:C.p400}}/><span style={{color:C.text3,fontSize:11}}>Post-meal</span></div>
           </div>
+        </div>
+      </div>
+
+      {/* ── Book a Free Consultation ── */}
+      <div style={{padding:"20px 24px 0"}}>
+        {/* Banner */}
+        <div className="card slide-up" style={{
+          padding:20,overflow:"hidden",position:"relative",
+          background:C.gradHeroCard,borderColor:C.gradHeroBorder,
+        }}>
+          <div style={{position:"absolute",top:-24,right:-24,width:100,height:100,borderRadius:"50%",background:C.accentMid,filter:"blur(28px)",pointerEvents:"none"}}/>
+          <div style={{position:"absolute",bottom:-20,left:-10,width:80,height:80,borderRadius:"50%",background:C.mesh2,filter:"blur(24px)",pointerEvents:"none"}}/>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,position:"relative"}}>
+            <div style={{flex:1}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
+                <div style={{background:C.greenBg,border:`1px solid ${C.greenBorder}`,borderRadius:999,padding:"3px 10px",color:C.green,fontSize:10,fontWeight:700}}>🎁 FREE</div>
+              </div>
+              <div style={{color:C.text1,fontWeight:800,fontSize:17,lineHeight:1.3,marginBottom:6}}>Book a Free Consultation</div>
+              <div style={{color:C.text3,fontSize:12,lineHeight:1.5,marginBottom:14}}>Connect with certified healthcare experts for personalised guidance.</div>
+              <button onClick={()=>document.getElementById("doc-scroll-row")?.scrollIntoView({behavior:"smooth"})} style={{
+                background:C.gradBtn,border:"none",borderRadius:10,padding:"9px 16px",
+                color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",
+                fontFamily:"Inter,sans-serif",boxShadow:`0 6px 18px ${C.accentBorder}`,
+              }}>Browse Doctors →</button>
+            </div>
+            <div style={{fontSize:64,flexShrink:0,filter:"drop-shadow(0 4px 16px rgba(139,92,246,0.3))",lineHeight:1}}>🩺</div>
+          </div>
+        </div>
+
+        {/* Doctor trust strip */}
+        <div style={{display:"flex",gap:16,marginTop:14,justifyContent:"center"}}>
+          {[{icon:"⭐",t:"Avg 4.8 Rating"},{icon:"🏥",t:"Certified Experts"},{icon:"🔒",t:"100% Confidential"}].map((b,i)=>(
+            <div key={i} style={{display:"flex",alignItems:"center",gap:5}}>
+              <span style={{fontSize:13}}>{b.icon}</span>
+              <span style={{color:C.text3,fontSize:11,fontWeight:500}}>{b.t}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Doctor horizontal scroll */}
+      <div id="doc-scroll-row" style={{paddingTop:20}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 24px",marginBottom:12}}>
+          <div style={{color:C.text1,fontWeight:700,fontSize:16}}>Our Specialists</div>
+          <span className="badge badge-green">✓ All Verified</span>
+        </div>
+        <div className="doc-scroll">
+          {DOCTORS_DATA.map(doc=>(
+            <DoctorCard key={doc.id} doc={doc} onSelect={openProfile} C={C}/>
+          ))}
         </div>
       </div>
 
