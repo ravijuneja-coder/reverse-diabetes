@@ -1300,7 +1300,7 @@ function DoctorProfileOverlay({doc,onClose,onBook,C}){
               <div style={{position:"absolute",bottom:-4,right:-4,width:22,height:22,borderRadius:"50%",background:C.gradLogo,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,border:`2px solid ${C.bg}`,color:"#fff",fontWeight:700}}>✓</div>
             )}
           </div>
-          <div style={{flex:1}}>
+          <div style={{flex:1,textAlign:"left"}}>
             <div style={{color:C.text1,fontWeight:800,fontSize:18,marginBottom:2}}>{doc.name}</div>
             <div style={{color:C.text2,fontSize:13,marginBottom:6}}>{doc.spec} · {doc.exp}</div>
             <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
@@ -1321,7 +1321,7 @@ function DoctorProfileOverlay({doc,onClose,onBook,C}){
         <div style={{padding:"16px 20px 0"}}>
           <div style={{background:C.greenBg,border:`1px solid ${C.greenBorder}`,borderRadius:12,padding:"10px 16px",display:"flex",alignItems:"center",gap:10}}>
             <span style={{fontSize:18}}>🎁</span>
-            <div>
+            <div style={{textAlign:"left"}}>
               <div style={{color:C.green,fontWeight:700,fontSize:13}}>Free Consultation</div>
               <div style={{color:C.text3,fontSize:11,marginTop:1}}>First session is completely free — no credit card required.</div>
             </div>
@@ -1330,14 +1330,14 @@ function DoctorProfileOverlay({doc,onClose,onBook,C}){
 
         {/* bio */}
         <div style={{padding:"16px 20px 0"}}>
-          <div className="card" style={{padding:16}}>
+          <div className="card" style={{padding:16,textAlign:"left"}}>
             <div style={{color:C.text1,fontWeight:600,fontSize:14,marginBottom:8}}>About</div>
             <div style={{color:C.text3,fontSize:13,lineHeight:1.65}}>{doc.bio}</div>
           </div>
         </div>
 
         {/* expertise */}
-        <div style={{padding:"14px 20px 0"}}>
+        <div style={{padding:"14px 20px 0",textAlign:"left"}}>
           <div style={{color:C.text1,fontWeight:600,fontSize:14,marginBottom:10}}>Expertise</div>
           <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
             {doc.expertise.map((e,i)=>(
@@ -1347,7 +1347,7 @@ function DoctorProfileOverlay({doc,onClose,onBook,C}){
         </div>
 
         {/* languages */}
-        <div style={{padding:"14px 20px 0"}}>
+        <div style={{padding:"14px 20px 0",textAlign:"left"}}>
           <div style={{color:C.text1,fontWeight:600,fontSize:14,marginBottom:10}}>Languages</div>
           <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
             {doc.langs.map((l,i)=>(
@@ -1357,7 +1357,7 @@ function DoctorProfileOverlay({doc,onClose,onBook,C}){
         </div>
 
         {/* time slots */}
-        <div style={{padding:"14px 20px 0"}}>
+        <div style={{padding:"14px 20px 0",textAlign:"left"}}>
           <div style={{color:C.text1,fontWeight:600,fontSize:14,marginBottom:10}}>Available Timings</div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
             {doc.times.map((t,i)=>(
@@ -1370,7 +1370,7 @@ function DoctorProfileOverlay({doc,onClose,onBook,C}){
         </div>
 
         {/* reviews preview */}
-        <div style={{padding:"14px 20px 0"}}>
+        <div style={{padding:"14px 20px 0",textAlign:"left"}}>
           <div style={{color:C.text1,fontWeight:600,fontSize:14,marginBottom:10}}>Patient Reviews</div>
           <div style={{display:"flex",flexDirection:"column",gap:10}}>
             {[
@@ -1742,6 +1742,72 @@ function NotificationPanel({open,onClose,notifications,onRead,onMarkAll,C}){
   );
 }
 
+function DoctorsListOverlay({onClose,onSelect,C}){
+  return(
+    <div className="overlay-panel overlay-in">
+      {/* header */}
+      <div style={{padding:"52px 20px 16px",background:C.navBg,borderBottom:`1px solid ${C.border}`,backdropFilter:"blur(20px)",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div>
+          <div style={{color:C.text1,fontWeight:700,fontSize:18}}>Our Specialists</div>
+          <div style={{color:C.text3,fontSize:12,marginTop:2}}>Certified healthcare experts — free consultation</div>
+        </div>
+        <button onClick={onClose} style={{width:34,height:34,borderRadius:10,background:C.surface,border:`1px solid ${C.border}`,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:C.text2,fontSize:16,fontFamily:"Inter,sans-serif",flexShrink:0}}>✕</button>
+      </div>
+
+      {/* trust strip */}
+      <div style={{display:"flex",justifyContent:"space-around",padding:"12px 20px",borderBottom:`1px solid ${C.border}`,background:C.bgAlt,flexShrink:0}}>
+        {[{icon:"⭐",t:"Avg 4.8 Rating"},{icon:"🏥",t:"Certified Experts"},{icon:"🔒",t:"100% Confidential"}].map((b,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:4}}>
+            <span style={{fontSize:12}}>{b.icon}</span>
+            <span style={{color:C.text3,fontSize:11,fontWeight:500,whiteSpace:"nowrap"}}>{b.t}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* scrollable doctor list */}
+      <div style={{flex:1,overflowY:"auto",padding:"16px 20px",display:"flex",flexDirection:"column",gap:12}}>
+        {DOCTORS_DATA.map((doc,i)=>{
+          const colorMap={green:C.green,orange:C.orange,cyan:C.cyan};
+          const bgMap={green:C.greenBg,orange:C.orangeBg,cyan:"rgba(6,182,212,0.12)"};
+          const avColor=colorMap[doc.availColor]||C.green;
+          const avBg=bgMap[doc.availColor]||C.greenBg;
+          return(
+            <div key={doc.id} className="card slide-up" onClick={()=>onSelect(doc)}
+              style={{padding:"14px 16px",display:"flex",gap:14,alignItems:"center",cursor:"pointer",animationDelay:`${i*0.06}s`,textAlign:"left"}}>
+              {/* avatar */}
+              <div style={{position:"relative",flexShrink:0}}>
+                <div style={{width:56,height:56,borderRadius:18,fontSize:32,background:C.gradHeroCard,border:`1px solid ${C.gradHeroBorder}`,display:"flex",alignItems:"center",justifyContent:"center"}}>{doc.emoji}</div>
+                {doc.verified&&(
+                  <div style={{position:"absolute",bottom:-3,right:-3,width:18,height:18,borderRadius:"50%",background:C.gradLogo,display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,border:`2px solid ${C.bg}`,color:"#fff",fontWeight:700}}>✓</div>
+                )}
+              </div>
+              {/* info */}
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{color:C.text1,fontWeight:700,fontSize:14,marginBottom:1}}>{doc.name}</div>
+                <div style={{color:C.text3,fontSize:12,marginBottom:5}}>{doc.spec} · {doc.exp}</div>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:3}}>
+                    <Stars rating={doc.rating} C={C}/>
+                    <span style={{color:C.text3,fontSize:11,marginLeft:2}}>{doc.rating} ({doc.reviews})</span>
+                  </div>
+                  <div style={{display:"flex",alignItems:"center",gap:4,background:avBg,borderRadius:999,padding:"2px 8px"}}>
+                    <div style={{width:5,height:5,borderRadius:"50%",background:avColor}}/>
+                    <span style={{color:avColor,fontSize:10,fontWeight:600}}>{doc.avail}</span>
+                  </div>
+                </div>
+              </div>
+              {/* cta */}
+              <div style={{background:C.gradBtn,borderRadius:10,padding:"8px 12px",color:"#fff",fontSize:12,fontWeight:700,flexShrink:0,whiteSpace:"nowrap"}}>
+                Book →
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════
    HOME DASHBOARD
 ═══════════════════════════════════════════════════════════ */
@@ -1751,16 +1817,26 @@ function HomeScreen({setTab}){
   const[notifications,setNotifications]=useState(NOTIF_SEED);
   const unread=notifications.filter(n=>!n.read).length;
   const[selectedDoctor,setSelectedDoctor]=useState(null);
-  const[bookingState,setBookingState]=useState(null); // {doc, time}
+  const[bookingState,setBookingState]=useState(null);
+  const[showDoctors,setShowDoctors]=useState(false);
 
   const markRead=(id)=>setNotifications(ns=>ns.map(n=>n.id===id?{...n,read:true}:n));
   const markAll=()=>setNotifications(ns=>ns.map(n=>({...n,read:true})));
-  const openProfile=(doc)=>{setSelectedDoctor(doc);setNotifOpen(false);};
+  const openProfile=(doc)=>{setSelectedDoctor(doc);setShowDoctors(false);};
   const openBooking=(doc,time)=>{setBookingState({doc,time});setSelectedDoctor(null);};
   const closeBooking=()=>setBookingState(null);
 
   return(
     <>
+      {/* Doctors list overlay */}
+      {showDoctors&&(
+        <DoctorsListOverlay
+          onClose={()=>setShowDoctors(false)}
+          onSelect={openProfile}
+          C={C}
+        />
+      )}
+
       {/* Doctor profile overlay — outside .screen so it covers full app-shell */}
       {selectedDoctor&&(
         <DoctorProfileOverlay
@@ -1796,9 +1872,9 @@ function HomeScreen({setTab}){
 
       {/* Header */}
       <div className="anim-fade-up" style={{padding:"52px 24px 0",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-        <div>
-          <div style={{color:C.text3,fontSize:13}}>Good morning 👋</div>
-          <div style={{color:C.text1,fontWeight:700,fontSize:22,marginTop:2}}>Aarav Sharma</div>
+        <div style={{textAlign:"left"}}>
+          <div style={{color:C.text3,fontSize:13}}>{(()=>{const h=new Date().getHours();return h<12?"Good morning 🌅":h<17?"Good afternoon ☀️":"Good evening 🌙";})()}</div>
+          <div style={{color:C.text1,fontWeight:700,fontSize:22,marginTop:2}}>Ravi Juneja</div>
         </div>
         <div style={{display:"flex",gap:10,alignItems:"center"}}>
           <div style={{position:"relative"}} onClick={()=>setNotifOpen(v=>!v)}>
@@ -1811,7 +1887,7 @@ function HomeScreen({setTab}){
               </div>
             )}
           </div>
-          <div onClick={()=>setTab("profile")} style={{width:40,height:40,borderRadius:12,background:C.gradLogo,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:14,color:C.white,cursor:"pointer",transition:"opacity .15s"}} onMouseEnter={e=>e.currentTarget.style.opacity=".8"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>AS</div>
+          <div onClick={()=>setTab("profile")} style={{width:40,height:40,borderRadius:12,background:C.gradLogo,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:14,color:C.white,cursor:"pointer",transition:"opacity .15s"}} onMouseEnter={e=>e.currentTarget.style.opacity=".8"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>RJ</div>
         </div>
       </div>
 
@@ -1924,7 +2000,7 @@ function HomeScreen({setTab}){
               </div>
               <div style={{color:C.text1,fontWeight:800,fontSize:17,lineHeight:1.3,marginBottom:6}}>Book a Free Consultation</div>
               <div style={{color:C.text3,fontSize:12,lineHeight:1.5,marginBottom:14}}>Connect with certified healthcare experts for personalised guidance.</div>
-              <button onClick={()=>document.getElementById("doc-scroll-row")?.scrollIntoView({behavior:"smooth"})} style={{
+              <button onClick={()=>setShowDoctors(true)} style={{
                 background:C.gradBtn,border:"none",borderRadius:10,padding:"9px 16px",
                 color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",
                 fontFamily:"Inter,sans-serif",boxShadow:`0 6px 18px ${C.accentBorder}`,
@@ -1946,18 +2022,6 @@ function HomeScreen({setTab}){
       </div>
 
       {/* Doctor horizontal scroll */}
-      <div id="doc-scroll-row" style={{paddingTop:20}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 24px",marginBottom:12}}>
-          <div style={{color:C.text1,fontWeight:700,fontSize:16}}>Our Specialists</div>
-          <span className="badge badge-green">✓ All Verified</span>
-        </div>
-        <div className="doc-scroll">
-          {DOCTORS_DATA.map(doc=>(
-            <DoctorCard key={doc.id} doc={doc} onSelect={openProfile} C={C}/>
-          ))}
-        </div>
-      </div>
-
       {/* AI recommendation */}
       <div style={{padding:"16px 24px 0"}}>
         <div className="card anim-fade-up d4" style={{padding:16,borderColor:C.accentBorder,background:C.accentSubtle,cursor:"pointer"}} onClick={()=>setTab("coach")}>
@@ -2618,12 +2682,12 @@ function ProfileScreen({onSignOut,onCompleteProfile}){
         {/* Hero */}
         <div style={{padding:"52px 24px 0",textAlign:"center"}}>
           <div style={{position:"relative",display:"inline-block",marginBottom:16}}>
-            <div style={{width:88,height:88,borderRadius:26,background:C.gradLogo,display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,fontWeight:700,color:C.white,margin:"0 auto",boxShadow:`0 12px 36px ${C.notchGlow}`}}>AS</div>
+            <div style={{width:88,height:88,borderRadius:26,background:C.gradLogo,display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,fontWeight:700,color:C.white,margin:"0 auto",boxShadow:`0 12px 36px ${C.notchGlow}`}}>RJ</div>
             <div style={{position:"absolute",bottom:-2,right:-2,width:26,height:26,borderRadius:"50%",background:C.green,border:`3px solid ${C.bg}`,display:"flex",alignItems:"center",justifyContent:"center"}}>
               <SvgIcon d={IC.check} size={12} color={C.white} sw={3}/>
             </div>
           </div>
-          <div style={{fontWeight:800,fontSize:22,color:C.text1}}>Aarav Sharma</div>
+          <div style={{fontWeight:800,fontSize:22,color:C.text1}}>Ravi Juneja</div>
           <div style={{color:C.text3,fontSize:13,marginTop:2}}>aarav.sharma@gmail.com</div>
           <div style={{display:"flex",gap:8,justifyContent:"center",marginTop:10,flexWrap:"wrap"}}>
             <span className="badge badge-purple" style={{cursor:"pointer"}} onClick={()=>openModal("subscription")}>🏆 Pro Member</span>
@@ -2792,7 +2856,7 @@ export default function GlucoReviveAI(){
             {screen==="splash"    &&<SplashScreen onDone={()=>setScreen("login")}/>}
             {screen==="login"     &&<LoginScreen  onDone={()=>setScreen("privacy")}/>}
             {screen==="privacy"   &&<PrivacyTrustScreen onDone={()=>setScreen("onboarding")}/>}
-            {screen==="onboarding"&&<OnboardingScreen onDone={()=>setScreen("app")}/>}
+            {screen==="onboarding"&&<OnboardingScreen onDone={()=>{setTab("home");setScreen("app");}}/>}
 
             {screen==="app"&&(
               <>
