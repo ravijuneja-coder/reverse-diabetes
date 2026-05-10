@@ -694,6 +694,272 @@ function LoginScreen({onDone}){
 }
 
 /* ═══════════════════════════════════════════════════════════
+   PRIVACY & TRUST SCREEN
+═══════════════════════════════════════════════════════════ */
+function PrivacyTrustScreen({onDone,onReviewSettings}){
+  const C=useTheme();
+  const isDark=useIsDark();
+  const[consented,setConsented]=useState(false);
+  const[reviewOpen,setReviewOpen]=useState(false);
+  const[shieldPhase,setShieldPhase]=useState(0);
+
+  useState(()=>{
+    const t=setTimeout(()=>setShieldPhase(1),200);
+    return()=>clearTimeout(t);
+  });
+
+  /* ── colour helpers scoped to green/teal for healthcare trust ── */
+  const G={
+    shieldGlow:  isDark?"rgba(34,197,94,0.35)":"rgba(21,128,61,0.25)",
+    shieldRing:  isDark?"rgba(34,197,94,0.15)":"rgba(21,128,61,0.10)",
+    gradShield:  isDark?"linear-gradient(135deg,#22C55E,#06B6D4)":"linear-gradient(135deg,#15803D,#0E7490)",
+    gradBtn:     isDark?"linear-gradient(135deg,#16A34A,#0891B2)":"linear-gradient(135deg,#15803D,#0E7490)",
+    badge:       isDark?"rgba(34,197,94,0.12)":"rgba(21,128,61,0.10)",
+    badgeBorder: isDark?"rgba(34,197,94,0.30)":"rgba(21,128,61,0.25)",
+    badgeText:   C.green,
+    checkBg:     isDark?"rgba(34,197,94,0.15)":"rgba(21,128,61,0.10)",
+    checkBorder: isDark?"rgba(34,197,94,0.45)":"rgba(21,128,61,0.35)",
+    bgGrad:      isDark
+      ?`radial-gradient(ellipse at 50% 10%,rgba(34,197,94,0.12) 0%,transparent 55%),radial-gradient(ellipse at 80% 80%,rgba(6,182,212,0.10) 0%,transparent 50%),${C.bg}`
+      :`radial-gradient(ellipse at 50% 10%,rgba(21,128,61,0.08) 0%,transparent 55%),radial-gradient(ellipse at 80% 80%,rgba(14,116,144,0.07) 0%,transparent 50%),${C.bg}`,
+    verifiedBg:  isDark?"rgba(34,197,94,0.10)":"rgba(21,128,61,0.08)",
+    verifiedBorder:isDark?"rgba(34,197,94,0.25)":"rgba(21,128,61,0.20)",
+  };
+
+  const privacyFeatures=[
+    {icon:"🔐",title:"End-to-End Encrypted",    desc:"All your health data is encrypted in transit and at rest using AES-256 standards.",    badge:"256-bit SSL"},
+    {icon:"🚫",title:"Never Sold or Shared",      desc:"Your personal health information is never shared with third parties without your explicit consent.", badge:"Zero Data Selling"},
+    {icon:"🏥",title:"HIPAA-Aligned Principles",  desc:"We follow privacy-first healthcare design principles inspired by HIPAA guidelines.", badge:"Privacy First"},
+    {icon:"👤",title:"You're Always in Control",  desc:"Download, update, or delete your data at any time — full ownership, always.",         badge:"Your Data, Your Choice"},
+  ];
+
+  const reviewItems=[
+    {icon:"📊",label:"Health Metrics",   on:true},
+    {icon:"🗺️",label:"Location (City)",  on:true},
+    {icon:"📧",label:"Marketing Emails", on:false},
+    {icon:"📱",label:"Push Notifications",on:true},
+  ];
+  const[prefs,setPrefs]=useState({0:true,1:true,2:false,3:true});
+
+  return(
+    <div style={{
+      position:"relative",width:"100%",minHeight:844,overflow:"hidden",
+      background:G.bgGrad,
+      display:"flex",flexDirection:"column",
+    }}>
+      {/* subtle grid overlay */}
+      <div style={{position:"absolute",inset:0,backgroundImage:`linear-gradient(${C.gridLine} 1px,transparent 1px),linear-gradient(90deg,${C.gridLine} 1px,transparent 1px)`,backgroundSize:"36px 36px",pointerEvents:"none",opacity:.6}}/>
+
+      {/* animated ambient orbs */}
+      <div style={{position:"absolute",top:-40,left:"50%",transform:"translateX(-50%)",width:220,height:220,borderRadius:"50%",background:G.shieldRing,filter:"blur(60px)",pointerEvents:"none"}}/>
+      <div style={{position:"absolute",bottom:80,right:-30,width:160,height:160,borderRadius:"50%",background:isDark?"rgba(6,182,212,0.08)":"rgba(14,116,144,0.06)",filter:"blur(50px)",pointerEvents:"none"}}/>
+
+      {/* scrollable content */}
+      <div style={{flex:1,overflowY:"auto",overflowX:"hidden",padding:"0 0 100px"}}>
+
+        {/* ── Shield hero ── */}
+        <div className="anim-fade-up" style={{display:"flex",flexDirection:"column",alignItems:"center",paddingTop:52,paddingBottom:8}}>
+          {/* outer ring pulse */}
+          <div className={shieldPhase>=1?"anim-pulse":""} style={{
+            width:120,height:120,borderRadius:"50%",
+            background:G.shieldRing,
+            display:"flex",alignItems:"center",justifyContent:"center",
+            marginBottom:0,
+          }}>
+            {/* floating shield */}
+            <div className="anim-float" style={{
+              width:96,height:96,borderRadius:28,
+              background:G.gradShield,
+              display:"flex",alignItems:"center",justifyContent:"center",
+              boxShadow:`0 20px 56px ${G.shieldGlow}`,
+              fontSize:44,
+              opacity:shieldPhase>=1?1:0,
+              transition:"opacity .5s",
+            }}>🛡️</div>
+          </div>
+
+          {/* verified badge below shield */}
+          <div className="anim-fade-up d2" style={{
+            display:"flex",alignItems:"center",gap:6,
+            background:G.verifiedBg,border:`1px solid ${G.verifiedBorder}`,
+            borderRadius:999,padding:"5px 14px",marginTop:14,
+          }}>
+            <span style={{fontSize:13}}>✅</span>
+            <span style={{color:G.badgeText,fontSize:12,fontWeight:600,letterSpacing:.3}}>Verified Secure Platform</span>
+          </div>
+        </div>
+
+        {/* ── Headline ── */}
+        <div className="anim-fade-up d2" style={{textAlign:"center",padding:"18px 28px 0"}}>
+          <div style={{fontWeight:800,fontSize:24,color:C.text1,lineHeight:1.25,letterSpacing:"-0.4px",marginBottom:10}}>
+            Your Health Data is<br/><span className="grad-green">Safe &amp; Secure</span>
+          </div>
+          <div style={{color:C.text3,fontSize:13,lineHeight:1.65,maxWidth:310,margin:"0 auto"}}>
+            Your personal health information is encrypted, securely stored, and never shared without your permission. GlucoRevive AI follows privacy-first healthcare design principles to protect your data.
+          </div>
+        </div>
+
+        {/* ── Privacy feature cards ── */}
+        <div className="anim-fade-up d3" style={{padding:"20px 20px 0",display:"flex",flexDirection:"column",gap:10}}>
+          {privacyFeatures.map((f,i)=>(
+            <div key={i} className="card" style={{padding:"14px 16px",display:"flex",gap:12,alignItems:"flex-start"}}>
+              <div style={{
+                width:40,height:40,borderRadius:12,flexShrink:0,
+                background:G.badge,border:`1px solid ${G.badgeBorder}`,
+                display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,
+              }}>{f.icon}</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,flexWrap:"wrap"}}>
+                  <div style={{color:C.text1,fontWeight:600,fontSize:13}}>{f.title}</div>
+                  <div style={{
+                    background:G.badge,border:`1px solid ${G.badgeBorder}`,
+                    borderRadius:999,padding:"2px 8px",
+                    color:G.badgeText,fontSize:10,fontWeight:700,letterSpacing:.3,whiteSpace:"nowrap",flexShrink:0,
+                  }}>{f.badge}</div>
+                </div>
+                <div style={{color:C.text3,fontSize:12,marginTop:3,lineHeight:1.5}}>{f.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Compliance row ── */}
+        <div className="anim-fade-up d4" style={{padding:"16px 20px 0",display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>
+          {[
+            {icon:"🔒","label":"Data Encrypted"},
+            {icon:"🏥","label":"HIPAA-Aligned"},
+            {icon:"🛡️","label":"Privacy First"},
+            {icon:"✅","label":"Verified Safe"},
+          ].map((b,i)=>(
+            <div key={i} style={{
+              display:"flex",alignItems:"center",gap:5,
+              background:G.badge,border:`1px solid ${G.badgeBorder}`,
+              borderRadius:999,padding:"5px 10px",
+            }}>
+              <span style={{fontSize:12}}>{b.icon}</span>
+              <span style={{color:G.badgeText,fontSize:11,fontWeight:600}}>{b.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Privacy settings panel (collapsible) ── */}
+        {reviewOpen&&(
+          <div className="anim-fade-up card" style={{margin:"16px 20px 0",padding:16}}>
+            <div style={{color:C.text1,fontWeight:600,fontSize:14,marginBottom:12}}>Privacy Settings</div>
+            {reviewItems.map((item,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderBottom:i<reviewItems.length-1?`1px solid ${C.border}`:"none"}}>
+                <div style={{display:"flex",alignItems:"center",gap:10}}>
+                  <span style={{fontSize:18}}>{item.icon}</span>
+                  <span style={{color:C.text2,fontSize:13,fontWeight:500}}>{item.label}</span>
+                </div>
+                <div
+                  onClick={()=>setPrefs(p=>({...p,[i]:!p[i]}))}
+                  style={{
+                    width:44,height:24,borderRadius:12,cursor:"pointer",
+                    background:prefs[i]?G.gradBtn:C.toggleOff,
+                    position:"relative",transition:"background .25s",flexShrink:0,
+                  }}
+                >
+                  <div style={{
+                    position:"absolute",top:3,left:prefs[i]?22:3,width:18,height:18,
+                    borderRadius:"50%",background:"#fff",transition:"left .25s",
+                    boxShadow:"0 1px 4px rgba(0,0,0,0.25)",
+                  }}/>
+                </div>
+              </div>
+            ))}
+            <div style={{color:C.text3,fontSize:11,marginTop:10,lineHeight:1.5}}>
+              You can update these preferences anytime in Profile → Privacy Settings.
+            </div>
+          </div>
+        )}
+
+        {/* ── Consent checkbox ── */}
+        <div className="anim-fade-up d4" style={{padding:"18px 20px 0"}}>
+          <div
+            onClick={()=>setConsented(v=>!v)}
+            style={{
+              display:"flex",alignItems:"flex-start",gap:12,cursor:"pointer",
+              background:G.checkBg,border:`1px solid ${consented?G.badgeBorder:C.border}`,
+              borderRadius:14,padding:"14px 16px",transition:"border-color .2s,background .2s",
+            }}
+          >
+            <div style={{
+              width:22,height:22,borderRadius:6,flexShrink:0,marginTop:1,
+              background:consented?G.gradBtn:C.surface,
+              border:`1.5px solid ${consented?G.badgeBorder:C.border}`,
+              display:"flex",alignItems:"center",justifyContent:"center",
+              transition:"all .2s",boxShadow:consented?`0 0 0 3px ${G.shieldRing}`:"none",
+            }}>
+              {consented&&<span style={{fontSize:13,lineHeight:1}}>✓</span>}
+            </div>
+            <div style={{flex:1}}>
+              <div style={{color:C.text1,fontSize:13,fontWeight:500,lineHeight:1.5}}>
+                I understand and agree to how GlucoRevive AI collects and uses my health data as described above.
+              </div>
+              <div style={{color:C.text3,fontSize:11,marginTop:5,lineHeight:1.5}}>
+                By continuing you agree to our{" "}
+                <span style={{color:G.badgeText,fontWeight:600,cursor:"pointer",textDecoration:"underline"}}>Privacy Policy</span>
+                {" "}and{" "}
+                <span style={{color:G.badgeText,fontWeight:600,cursor:"pointer",textDecoration:"underline"}}>Terms &amp; Conditions</span>.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Action buttons ── */}
+        <div className="anim-fade-up d5" style={{padding:"16px 20px 0",display:"flex",flexDirection:"column",gap:10}}>
+          <button
+            onClick={()=>{if(consented)onDone();}}
+            style={{
+              display:"flex",alignItems:"center",justifyContent:"center",gap:8,
+              width:"100%",padding:"15px 24px",borderRadius:14,border:"none",cursor:consented?"pointer":"not-allowed",
+              fontFamily:"'Inter',sans-serif",fontSize:15,fontWeight:600,color:"#fff",
+              background:consented?G.gradBtn:C.surface,
+              boxShadow:consented?`0 8px 24px ${G.shieldGlow}`:"none",
+              opacity:consented?1:0.5,transition:"all .25s",
+            }}
+          >
+            <span style={{fontSize:17}}>🛡️</span> Continue Securely
+          </button>
+
+          <button
+            onClick={()=>setReviewOpen(v=>!v)}
+            style={{
+              display:"flex",alignItems:"center",justifyContent:"center",gap:8,
+              width:"100%",padding:"14px 24px",borderRadius:14,
+              border:`1px solid ${reviewOpen?G.badgeBorder:C.border}`,
+              cursor:"pointer",fontFamily:"'Inter',sans-serif",fontSize:15,fontWeight:500,
+              color:reviewOpen?G.badgeText:C.text2,
+              background:reviewOpen?G.badge:C.surface,
+              transition:"all .2s",
+            }}
+          >
+            <span style={{fontSize:16}}>⚙️</span>
+            {reviewOpen?"Hide Privacy Settings":"Review Privacy Settings"}
+          </button>
+        </div>
+
+        {/* ── Footer links ── */}
+        <div className="anim-fade-up d5" style={{padding:"16px 20px 0",textAlign:"center"}}>
+          <div style={{color:C.text3,fontSize:11,lineHeight:1.8}}>
+            <span style={{color:G.badgeText,fontWeight:600,cursor:"pointer",textDecoration:"underline"}}>Privacy Policy</span>
+            {"  ·  "}
+            <span style={{color:G.badgeText,fontWeight:600,cursor:"pointer",textDecoration:"underline"}}>Terms &amp; Conditions</span>
+            {"  ·  "}
+            <span style={{color:G.badgeText,fontWeight:600,cursor:"pointer",textDecoration:"underline"}}>Cookie Policy</span>
+          </div>
+          <div style={{color:C.text3,fontSize:10,marginTop:6,lineHeight:1.5}}>
+            🔒 Your data is encrypted with AES-256 · TLS 1.3 in transit
+          </div>
+        </div>
+
+      </div>{/* end scrollable */}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    ONBOARDING
 ═══════════════════════════════════════════════════════════ */
 function OnboardingScreen({onDone}){
@@ -1831,7 +2097,8 @@ export default function GlucoReviveAI(){
             {screen==="app"&&<ThemeToggle/>}
 
             {screen==="splash"    &&<SplashScreen onDone={()=>setScreen("login")}/>}
-            {screen==="login"     &&<LoginScreen  onDone={()=>setScreen("onboarding")}/>}
+            {screen==="login"     &&<LoginScreen  onDone={()=>setScreen("privacy")}/>}
+            {screen==="privacy"   &&<PrivacyTrustScreen onDone={()=>setScreen("onboarding")}/>}
             {screen==="onboarding"&&<OnboardingScreen onDone={()=>setScreen("app")}/>}
 
             {screen==="app"&&(
